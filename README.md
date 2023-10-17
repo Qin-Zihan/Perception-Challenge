@@ -18,10 +18,10 @@ External contours are detected in the binary mask. These contours represent the 
 
 Separation of Contour Points:
 Points from the detected contours are separated into two groups based on their horizontal (x) position in the image:
-
 Points on the left half of the image.
 Points on the right half of the image.
 Additionally, a condition is implemented to ignore points from the top-right corner of the image.
+
 Line Fitting:
 Using the separated contour points from both the left and right sides, two lines are fitted. These lines represent the general direction or orientation of the red objects in the respective halves of the image.
 
