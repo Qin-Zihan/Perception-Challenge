@@ -1,31 +1,56 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.7.34202.233
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PerceptionChallenge", "PerceptionChallenge\PerceptionChallenge.vcxproj", "{97E80DF6-4535-41D7-A817-BCD1F0A7FE62}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{97E80DF6-4535-41D7-A817-BCD1F0A7FE62}.Debug|x64.ActiveCfg = Debug|x64
-		{97E80DF6-4535-41D7-A817-BCD1F0A7FE62}.Debug|x64.Build.0 = Debug|x64
-		{97E80DF6-4535-41D7-A817-BCD1F0A7FE62}.Debug|x86.ActiveCfg = Debug|Win32
-		{97E80DF6-4535-41D7-A817-BCD1F0A7FE62}.Debug|x86.Build.0 = Debug|Win32
-		{97E80DF6-4535-41D7-A817-BCD1F0A7FE62}.Release|x64.ActiveCfg = Release|x64
-		{97E80DF6-4535-41D7-A817-BCD1F0A7FE62}.Release|x64.Build.0 = Release|x64
-		{97E80DF6-4535-41D7-A817-BCD1F0A7FE62}.Release|x86.ActiveCfg = Release|Win32
-		{97E80DF6-4535-41D7-A817-BCD1F0A7FE62}.Release|x86.Build.0 = Release|Win32
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {644D53A4-6F79-45A6-922D-DD7814006744}
-	EndGlobalSection
-EndGlobal
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+using namespace cv;
+
+int main() {
+    Mat img = imread("red.png");
+    Mat hsv, mask1, mask2, mask;
+
+    cvtColor(img, hsv, COLOR_BGR2HSV);
+
+    inRange(hsv, Scalar(0, 100, 100), Scalar(1, 255, 255), mask1);
+    inRange(hsv, Scalar(179, 100, 100), Scalar(180, 255, 255), mask2);
+    mask = mask1 + mask2;
+
+    std::vector<std::vector<Point> > contours;
+    findContours(mask, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+
+    std::vector<Point2f> left_points, right_points;
+
+    int width_threshold = img.cols * 0.75;
+    int height_threshold = img.rows * 0.15;
+
+    for (int i = 0; i < contours.size(); i++) {
+        for (int j = 0; j < contours[i].size(); j++) {
+            Point2f pt = contours[i][j];
+            if (pt.x > width_threshold && pt.y < height_threshold) {
+                continue;
+            }
+
+            if (pt.x < img.cols / 2) {
+                left_points.push_back(pt);
+            }
+            else {
+                right_points.push_back(pt);
+            }
+        }
+    }
+
+    Vec4f left_line, right_line;
+    fitLine(left_points, left_line, DIST_L2, 0, 0.01, 0.01);
+    fitLine(right_points, right_line, DIST_L2, 0, 0.01, 0.01);
+
+    Point2f left_start = Point2f(left_line[2] - 1000 * left_line[0], left_line[3] - 1000 * left_line[1]);
+    Point2f left_end = Point2f(left_line[2] + 1000 * left_line[0], left_line[3] + 1000 * left_line[1]);
+
+    Point2f right_start = Point2f(right_line[2] - 1000 * right_line[0], right_line[3] - 1000 * right_line[1]);
+    Point2f right_end = Point2f(right_line[2] + 1000 * right_line[0], right_line[3] + 1000 * right_line[1]);
+
+    line(img, left_start, left_end, Scalar(0, 0, 255), 2);
+    line(img, right_start, right_end, Scalar(0, 0, 255), 2);
+
+    imwrite("answer.png", img);
+
+    return 0;
+}
