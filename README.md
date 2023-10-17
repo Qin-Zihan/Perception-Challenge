@@ -34,5 +34,7 @@ In fitting the straight lines, I initially wanted to try using a Hough Transform
 
 ## Libraries used
 Modules in OpenCV:  
+
 Core Functionality (opencv2/opencv.hpp)  
+
 High-level GUI (opencv2/highgui/highgui.hpp)  
