@@ -33,6 +33,6 @@ In completing this challenge I ran into a lot of problems with the code, but in 
 In fitting the straight lines, I initially wanted to try using a Hough Transform, but that didn't work. After I learned the principle of Hough Transform, I learned that because these contour points do not form a continuous straight line, so that Hough Transform does not work. After that I tried to fit these points using the fitLine function, and because of the presence of the noise points in the upper right corner of the photo, the straight line on the right could not fit all the cones perfectly, so I manually eliminated the noise points in this area.
 
 ## Libraries used
-Modules in OpenCV:
-Core Functionality (opencv2/opencv.hpp)
-High-level GUI (opencv2/highgui/highgui.hpp)
+Modules in OpenCV:  
+Core Functionality (opencv2/opencv.hpp)  
+High-level GUI (opencv2/highgui/highgui.hpp)  
